@@ -79,8 +79,8 @@ from ros2 import RobotBaseNode, add_camera, add_rtx_lidar, pub_robo_data_ros2
 from geometry_msgs.msg import Twist
 
 
-from agent_cfg import unitree_go2_agent_cfg, unitree_g1_agent_cfg
-from custom_rl_env import UnitreeGo2CustomEnvCfg, G1RoughEnvCfg
+from agent_cfg import unitree_go2_agent_cfg, unitree_g1_agent_cfg, unitree_go1_agent_cfg
+from custom_rl_env import UnitreeGo2CustomEnvCfg, G1RoughEnvCfg, UnitreeGo1CustomEnvCfg
 import custom_rl_env
 
 from omnigraph import create_front_cam_omnigraph
@@ -129,8 +129,21 @@ def setup_custom_env():
             cfg_scene.func("/World/warehouse", cfg_scene, translation=(0.0, 0.0, 0.0))
 
         if (args_cli.custom_env == "office" and args_cli.terrain == 'flat'):
-            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/office.usd")
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/office_walls.usd")
             cfg_scene.func("/World/office", cfg_scene, translation=(0.0, 0.0, 0.0))
+
+        if (args_cli.custom_env == "warehouse_shelves" and args_cli.terrain == 'flat'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/warehouse_shelves.usd")
+            cfg_scene.func("/World/warehouse_shelves", cfg_scene, translation=(0.0, 0.0, 0.0))
+
+        if (args_cli.custom_env == "parking_lot" and args_cli.terrain == 'flat'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/parking_lot.usd")
+            cfg_scene.func("/World/parking_lot", cfg_scene, translation=(0.0, 0.0, -0.5),)
+
+        if (args_cli.custom_env == "racetrack" and args_cli.terrain == 'flat'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/racetrack.usd")
+            cfg_scene.func("/World/racetrack", cfg_scene, translation=(0.0, 0.0, 0.0),)
+            
     except:
         print("Error loading custom environment. You should download custom envs folder from: https://drive.google.com/drive/folders/1vVGuO1KIX1K6mD6mBHDZGm9nk2vaRyj3?usp=sharing")
 
@@ -167,10 +180,16 @@ def run_sim():
     """Play with RSL-RL agent."""
     # parse configuration
     
-    env_cfg = UnitreeGo2CustomEnvCfg()
+    print("[DEBUG] Before UnitreeGo1CustomEnvCfg()")
+    if args_cli.robot == "go1":
+        env_cfg = UnitreeGo1CustomEnvCfg() 
+        print("[DEBUG] After UnitreeGo1CustomEnvCfg()")
     
-    if args_cli.robot == "g1":
+    elif args_cli.robot == "g1":
         env_cfg = G1RoughEnvCfg()
+
+    else:
+        env_cfg = UnitreeGo2CustomEnvCfg()
 
     # add N robots to env 
     env_cfg.scene.num_envs = args_cli.robot_amount
@@ -181,10 +200,16 @@ def run_sim():
         
     specify_cmd_for_robots(env_cfg.scene.num_envs)
 
-    agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go2_agent_cfg
+    print("[DEBUG] Before unitree_go1_agent_cfg")
+    if args_cli.robot == "go1":
+        agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go1_agent_cfg
+        print("[DEBUG] After unitree_go1_agent_cfg")
 
-    if args_cli.robot == "g1":
+    elif args_cli.robot == "g1":
         agent_cfg: RslRlOnPolicyRunnerCfg = unitree_g1_agent_cfg
+
+    else:
+        agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go2_agent_cfg
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)

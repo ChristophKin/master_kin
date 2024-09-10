@@ -39,6 +39,7 @@ from omni.isaac.orbit.sensors import ContactSensorCfg, RayCasterCfg, patterns
 from omni.isaac.orbit.terrains import TerrainImporterCfg
 from omni.isaac.orbit.utils import configclass
 from omni.isaac.orbit_assets.unitree import UNITREE_GO2_CFG 
+from omni.isaac.orbit_assets.unitree import UNITREE_GO1_CFG
 from omni.isaac.orbit.managers import EventTermCfg as EventTerm
 from omni.isaac.orbit.managers import ObservationGroupCfg as ObsGroup
 from omni.isaac.orbit.managers import ObservationTermCfg as ObsTerm
@@ -110,12 +111,12 @@ class MySceneCfg(InteractiveSceneCfg):
     # lights
     light = AssetBaseCfg(
         prim_path="/World/light",
-        spawn=sim_utils.DistantLightCfg(color=(0.75, 0.75, 0.75), intensity=3000.0),
+        spawn=sim_utils.DistantLightCfg(color=(0.75, 0.75, 0.75), intensity=3500.0),
     )
 
     sky_light = AssetBaseCfg(
         prim_path="/World/skyLight",
-        spawn=sim_utils.DomeLightCfg(color=(0.13, 0.13, 0.13), intensity=1000.0),
+        spawn=sim_utils.DomeLightCfg(color=(0.13, 0.13, 0.13), intensity=3000.0),
     )
 
 
@@ -304,6 +305,31 @@ class UnitreeGo2CustomEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         self.scene.robot = UNITREE_GO2_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
+
+        # reduce action scale
+        self.actions.joint_pos.scale = 0.25
+
+        # rewards
+        self.rewards.feet_air_time.params["sensor_cfg"].body_names = ".*_foot"
+        self.rewards.feet_air_time.weight = 0.01
+        self.rewards.undesired_contacts = None
+        self.rewards.dof_torques_l2.weight = -0.0002
+        self.rewards.track_lin_vel_xy_exp.weight = 1.5
+        self.rewards.track_ang_vel_z_exp.weight = 0.75
+        self.rewards.dof_acc_l2.weight = -2.5e-7
+
+        # terminations
+        self.terminations.base_contact.params["sensor_cfg"].body_names = "base"
+
+
+@configclass
+class UnitreeGo1CustomEnvCfg(LocomotionVelocityRoughEnvCfg):
+    def __post_init__(self):
+        # post init of parent
+        super().__post_init__()
+
+        self.scene.robot = UNITREE_GO1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
 
         # reduce action scale

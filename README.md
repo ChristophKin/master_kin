@@ -140,20 +140,14 @@ https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#
 ```
 
 ## Usage
-The current project was tested on Ubuntu 22.04, IsaacSim 2023.1.1 with Orbit 0.3.0 and Nvidia Driver Version: 545.
-To start the project with Unitree GO2, execute:
+The current project was tested on Ubuntu 22.04, IsaacSim 2023.1.1 with IsaacLab 0.3.1 and Nvidia Driver Version: 550.
+To start the project with Unitree Go2, execute:
 
 ```
 ./run_sim.sh
 ```
 
-To start the project with Unitree G1, execute:
-
-```
-./run_sim_g1.sh
-```
-
-You can control the dog using "WASD" keyboard commands
+You can control the quadruped robot using "WASD" keyboard commands. Change the run_sim.sh file for Unitree Go1 or G1.
 
 ## ROS2 SDK
 
