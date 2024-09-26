@@ -108,7 +108,7 @@ class TerrainGeneratorCfg:
     """The seed for the random number generator. Defaults to None,
     in which case the seed is not set."""
 
-    curriculum: bool = False
+    curriculum: bool = True
     """Whether to use the curriculum mode. Defaults to False.
 
     If True, the terrains are generated based on their difficulty parameter. Otherwise,
@@ -168,7 +168,7 @@ class TerrainGeneratorCfg:
     configurations.
     """
 
-    difficulty_range: tuple[float, float] = (0.0, 1.0)
+    difficulty_range: tuple[float, float] = (0.5, 0.5)
     """The range of difficulty values for the sub-terrains. Defaults to (0.0, 1.0).
 
     If curriculum is enabled, the terrains will be generated based on this range in ascending order

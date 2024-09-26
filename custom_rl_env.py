@@ -80,6 +80,7 @@ class MySceneCfg(InteractiveSceneCfg):
             terrain_type="plane",
             debug_vis=False,
         )
+
     else:
         terrain = TerrainImporterCfg(
         prim_path="/World/ground",
@@ -111,12 +112,14 @@ class MySceneCfg(InteractiveSceneCfg):
     # lights
     light = AssetBaseCfg(
         prim_path="/World/light",
-        spawn=sim_utils.DistantLightCfg(color=(0.75, 0.75, 0.75), intensity=3500.0),
+        spawn=sim_utils.DistantLightCfg(color=(1.0, 1.0, 1.0), intensity=3500.0),
+#        spawn=sim_utils.DistantLightCfg(color=(0.75, 0.75, 0.75), intensity=3500.0),
     )
 
     sky_light = AssetBaseCfg(
         prim_path="/World/skyLight",
-        spawn=sim_utils.DomeLightCfg(color=(0.13, 0.13, 0.13), intensity=3000.0),
+        spawn=sim_utils.DomeLightCfg(color=(1.0, 1.0, 1.0), intensity=3000.0),
+#        spawn=sim_utils.DomeLightCfg(color=(0.13, 0.13, 0.13), intensity=3000.0),
     )
 
 

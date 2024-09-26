@@ -61,6 +61,7 @@ ext_manager.set_extension_enabled_immediate("omni.isaac.ros2_bridge", True)
 import gymnasium as gym
 import torch
 import carb
+from omni.isaac.core.utils.carb import set_carb_setting
 
 
 from omni.isaac.orbit_tasks.utils import get_checkpoint_path
@@ -132,17 +133,17 @@ def setup_custom_env():
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/office_walls.usd")
             cfg_scene.func("/World/office", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "warehouse_shelves" and args_cli.terrain == 'flat'):
-            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/warehouse_shelves.usd")
-            cfg_scene.func("/World/warehouse_shelves", cfg_scene, translation=(0.0, 0.0, 0.0))
+        if (args_cli.custom_env == "warehouse_full" and args_cli.terrain == 'flat'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/warehouse_full.usd")
+            cfg_scene.func("/World/warehouse_full", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "parking_lot" and args_cli.terrain == 'flat'):
-            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/parking_lot.usd")
-            cfg_scene.func("/World/parking_lot", cfg_scene, translation=(0.0, 0.0, -0.5),)
+        if (args_cli.custom_env == "brownstone" and args_cli.terrain == 'flat'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/brownstone.usd")
+            cfg_scene.func("/World/brownstone", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "racetrack" and args_cli.terrain == 'flat'):
-            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/racetrack.usd")
-            cfg_scene.func("/World/racetrack", cfg_scene, translation=(0.0, 0.0, 0.0),)
+        if (args_cli.custom_env == "littlepark" and args_cli.terrain == 'rough'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/littlepark.usd")
+            cfg_scene.func("/World/littlepark", cfg_scene, translation=(0.0, 0.0, 0.0))
             
     except:
         print("Error loading custom environment. You should download custom envs folder from: https://drive.google.com/drive/folders/1vVGuO1KIX1K6mD6mBHDZGm9nk2vaRyj3?usp=sharing")
@@ -155,7 +156,6 @@ def cmd_vel_cb(msg, num_robot):
     custom_rl_env.base_command[str(num_robot)] = [x, y, z]
 
 
-
 def add_cmd_sub(num_envs):
     node_test = rclpy.create_node('position_velocity_publisher')
     for i in range(num_envs):
@@ -165,10 +165,11 @@ def add_cmd_sub(num_envs):
     thread.start()
 
 
-
 def specify_cmd_for_robots(numv_envs):
     for i in range(numv_envs):
         custom_rl_env.base_command[str(i)] = [0, 0, 0]
+
+
 def run_sim():
     
     # acquire input interface
@@ -242,7 +243,17 @@ def run_sim():
     annotator_lst = add_rtx_lidar(env_cfg.scene.num_envs, args_cli.robot, False)
     add_camera(env_cfg.scene.num_envs, args_cli.robot)
     setup_custom_env()
-    
+
+    # render settings interface
+    carb_settings = carb.settings.get_settings()
+    # set render values
+    set_carb_setting(carb_settings, "/rtx/ecoMode/enabled", True)
+    set_carb_setting(carb_settings, "/rtx/indirectDiffuse/enabled", False)
+    set_carb_setting(carb_settings, "/rtx/ambientOcclusion/enabled", False)
+    set_carb_setting(carb_settings, "/rtx/reflections/enabled", False)
+    set_carb_setting(carb_settings, "/rtx/raytracing/subsurface/enabled", False)
+
+
     start_time = time.time()
     # simulate environment
     while simulation_app.is_running():

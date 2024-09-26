@@ -28,7 +28,7 @@ import omni.isaac.orbit.terrains as terrain_gen
 
 ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
     size=(8.0, 8.0),
-    border_width=0.0,
+    border_width=10.0,
     num_rows=1,
     num_cols=2,
     horizontal_scale=0.1,
@@ -38,7 +38,7 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
     sub_terrains={
         "pyramid_stairs": terrain_gen.MeshPyramidStairsTerrainCfg(
             proportion=0.2,
-            step_height_range=(0.05, 0.23),
+            step_height_range=(0.07, 0.07),
             step_width=0.3,
             platform_width=3.0,
             border_width=1.0,
@@ -46,7 +46,7 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
         ),
         "pyramid_stairs_inv": terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
             proportion=0.2,
-            step_height_range=(0.05, 0.23),
+            step_height_range=(0.075, 0.075),
             step_width=0.3,
             platform_width=3.0,
             border_width=1.0,
