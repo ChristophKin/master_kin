@@ -181,10 +181,8 @@ def run_sim():
     """Play with RSL-RL agent."""
     # parse configuration
     
-    print("[DEBUG] Before UnitreeGo1CustomEnvCfg()")
     if args_cli.robot == "go1":
         env_cfg = UnitreeGo1CustomEnvCfg() 
-        print("[DEBUG] After UnitreeGo1CustomEnvCfg()")
     
     elif args_cli.robot == "g1":
         env_cfg = G1RoughEnvCfg()
@@ -201,10 +199,8 @@ def run_sim():
         
     specify_cmd_for_robots(env_cfg.scene.num_envs)
 
-    print("[DEBUG] Before unitree_go1_agent_cfg")
     if args_cli.robot == "go1":
         agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go1_agent_cfg
-        print("[DEBUG] After unitree_go1_agent_cfg")
 
     elif args_cli.robot == "g1":
         agent_cfg: RslRlOnPolicyRunnerCfg = unitree_g1_agent_cfg

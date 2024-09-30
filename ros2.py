@@ -72,6 +72,16 @@ def add_rtx_lidar(num_envs, robot_type, debug=False):
                                     config_file_name= "Unitree_L1",
                                 )
         
+        elif robot_type == "go1":
+            lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/trunk/lidar_sensor',
+                                    rotation_frequency = 200,
+                                    pulse_time=1, 
+                                    translation=(0.0, 0, 0.4),
+                                    orientation=(1.0, 0.0, 0.0, 0.0),
+                                    #config_file_name= "Unitree_L1",
+                                    config_file_name= "OS1_REV6_32ch20hz1024res", 
+                                    )
+
         else:
             lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/base/lidar_sensor',
                                     rotation_frequency = 200,
@@ -109,6 +119,9 @@ def add_camera(num_envs, robot_type):
         if robot_type == "g1":
             cameraCfg.prim_path = f"/World/envs/env_{i}/Robot/head_link/front_cam"
             cameraCfg.offset = CameraCfg.OffsetCfg(pos=(0.0, 0.0, 0.0), rot=(0.5, -0.5, 0.5, -0.5), convention="ros")
+
+        elif robot_type == "go1":
+            cameraCfg.prim_path = f"/World/envs/env_{i}/Robot/trunk/front_cam"
 
         Camera(cameraCfg)
 

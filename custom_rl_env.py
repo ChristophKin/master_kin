@@ -333,7 +333,7 @@ class UnitreeGo1CustomEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
 
         self.scene.robot = UNITREE_GO1_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/base"
+        self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/trunk"
 
         # reduce action scale
         self.actions.joint_pos.scale = 0.25
@@ -348,7 +348,7 @@ class UnitreeGo1CustomEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.dof_acc_l2.weight = -2.5e-7
 
         # terminations
-        self.terminations.base_contact.params["sensor_cfg"].body_names = "base"
+        self.terminations.base_contact.params["sensor_cfg"].body_names = "trunk"
 
 
 @configclass

@@ -109,10 +109,10 @@ unitree_go1_agent_cfg = {
         'max_iterations': 1500, 
         'empirical_normalization': False, 
         'policy': {
-            'class_name': 'ActorCritic',  #maybe ActorCritic instead of MyActorCritic
+            'class_name': 'ActorCritic',
             'init_noise_std': 1.0, 
             'actor_hidden_dims': [512, 128, 128], 
-            'critic_hidden_dims': [512, 256, 128], 
+            'critic_hidden_dims': [512, 256, 256], 
             'activation': 'elu'
             }, 
         'algorithm': {
