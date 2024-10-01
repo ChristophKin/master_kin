@@ -36,7 +36,7 @@ cd ..
 
 eval "$(conda shell.bash hook)"
 conda activate orbit
-export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6  ######
 
 # Run the Python script
-python main.py --robot_amount 1 --robot go1 --terrain rough --custom_env littlepark
+python main.py --robot go1 --terrain flat --custom_env office

@@ -131,10 +131,10 @@ def pub_robo_data_ros2(robot_type, num_envs, base_node, env, annotator_lst, star
     for i in range(num_envs):
         # publish ros2 info
         base_node.publish_joints(env.env.scene["robot"].data.joint_names, env.env.scene["robot"].data.joint_pos[i], i)
-        base_node.publish_odom(env.env.scene["robot"].data.root_state_w[i, :3], env.env.scene["robot"].data.root_state_w[i, 3:7], i)
+        #base_node.publish_odom(env.env.scene["robot"].data.root_state_w[i, :3], env.env.scene["robot"].data.root_state_w[i, 3:7], i)
         base_node.publish_imu(env.env.scene["robot"].data.root_state_w[i, 3:7], env.env.scene["robot"].data.root_lin_vel_b[i, :], env.env.scene["robot"].data.root_ang_vel_b[i, :], i)
         
-        
+        '''
         if robot_type == "go2":
             base_node.publish_robot_state([
                 env.env.scene["contact_forces"].data.net_forces_w[i][4][2], 
@@ -142,7 +142,7 @@ def pub_robo_data_ros2(robot_type, num_envs, base_node, env, annotator_lst, star
                 env.env.scene["contact_forces"].data.net_forces_w[i][14][2], 
                 env.env.scene["contact_forces"].data.net_forces_w[i][18][2]
                 ], i)
-
+        '''
         try:
             if (time.time() - start_time) > 1/20:
                 for j in range(num_envs):
@@ -170,10 +170,10 @@ class RobotBaseNode(Node):
 
         for i in range(num_envs):
             self.joint_pub.append(self.create_publisher(JointState, f'robot{i}/joint_states', qos_profile))
-            self.go2_state_pub.append(self.create_publisher(Go2State, f'robot{i}/go2_states', qos_profile))
-            self.go2_lidar_pub.append(self.create_publisher(PointCloud2, f'robot{i}/point_cloud2', qos_profile))
-            self.odom_pub.append(self.create_publisher(Odometry, f'robot{i}/odom', qos_profile))
-            self.imu_pub.append(self.create_publisher(Imu, f'robot{i}/imu', qos_profile))
+            #self.go2_state_pub.append(self.create_publisher(Go2State, f'robot{i}/go2_states', qos_profile))
+            self.go2_lidar_pub.append(self.create_publisher(PointCloud2, f'/sensing/lidar/top/points', qos_profile))
+            #self.odom_pub.append(self.create_publisher(Odometry, f'robot{i}/odom', qos_profile))
+            self.imu_pub.append(self.create_publisher(Imu, f'/sensing/imu/imu_data', qos_profile))
         self.broadcaster= TransformBroadcaster(self, qos=qos_profile)
         
     def publish_joints(self, joint_names_lst, joint_state_lst, robot_num):
