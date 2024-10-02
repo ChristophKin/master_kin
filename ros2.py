@@ -38,7 +38,7 @@ from std_msgs.msg import Header
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2, PointField, Imu
 from sensor_msgs_py import point_cloud2
-
+from geometry_msgs.msg import TwistWithCovariance
 
 
 from omni.isaac.orbit.sensors import CameraCfg, Camera
@@ -131,9 +131,9 @@ def pub_robo_data_ros2(robot_type, num_envs, base_node, env, annotator_lst, star
     for i in range(num_envs):
         # publish ros2 info
         base_node.publish_joints(env.env.scene["robot"].data.joint_names, env.env.scene["robot"].data.joint_pos[i], i)
-        #base_node.publish_odom(env.env.scene["robot"].data.root_state_w[i, :3], env.env.scene["robot"].data.root_state_w[i, 3:7], i)
+        base_node.publish_odom(env.env.scene["robot"].data.root_state_w[i, :3], env.env.scene["robot"].data.root_state_w[i, 3:7], env.env.scene["robot"].data.root_state_w[i, 7:10], env.env.scene["robot"].data.root_state_w[i, 10:],i)
         base_node.publish_imu(env.env.scene["robot"].data.root_state_w[i, 3:7], env.env.scene["robot"].data.root_lin_vel_b[i, :], env.env.scene["robot"].data.root_ang_vel_b[i, :], i)
-        
+        base_node.publish_twist(env.env.scene["robot"].data.root_state_w[i, 7:10], env.env.scene["robot"].data.root_state_w[i, 10:],i)
         '''
         if robot_type == "go2":
             base_node.publish_robot_state([
@@ -167,13 +167,15 @@ class RobotBaseNode(Node):
         self.go2_lidar_pub = []
         self.odom_pub = []
         self.imu_pub = []
+        self.twist_pub = []
 
         for i in range(num_envs):
-            self.joint_pub.append(self.create_publisher(JointState, f'robot{i}/joint_states', qos_profile))
-            #self.go2_state_pub.append(self.create_publisher(Go2State, f'robot{i}/go2_states', qos_profile))
-            self.go2_lidar_pub.append(self.create_publisher(PointCloud2, f'/sensing/lidar/top/points', qos_profile))
-            #self.odom_pub.append(self.create_publisher(Odometry, f'robot{i}/odom', qos_profile))
-            self.imu_pub.append(self.create_publisher(Imu, f'/sensing/imu/imu_data', qos_profile))
+            self.joint_pub.append(self.create_publisher(JointState, 'robot/joint_states', qos_profile))
+            #self.go2_state_pub.append(self.create_publisher(Go2State, f'robot/go2_states', qos_profile))
+            self.go2_lidar_pub.append(self.create_publisher(PointCloud2, '/sensing/lidar/top/points', qos_profile))
+            self.odom_pub.append(self.create_publisher(Odometry, 'sensing/odom/odom_data', qos_profile))
+            self.imu_pub.append(self.create_publisher(Imu, '/sensing/imu/imu_data', qos_profile))
+            self.twist_pub.append(self.create_publisher(TwistWithCovariance, '/sensing/odom/twist_data', qos_profile))
         self.broadcaster= TransformBroadcaster(self, qos=qos_profile)
         
     def publish_joints(self, joint_names_lst, joint_state_lst, robot_num):
@@ -183,7 +185,7 @@ class RobotBaseNode(Node):
 
         joint_state_names_formated = []
         for joint_name in joint_names_lst:
-            joint_state_names_formated.append(f"robot{robot_num}/"+joint_name)
+            joint_state_names_formated.append("robot_base/"+joint_name)
 
         joint_state_formated = []
         for joint_state_val in joint_state_lst:
@@ -193,11 +195,11 @@ class RobotBaseNode(Node):
         joint_state.position = joint_state_formated
         self.joint_pub[robot_num].publish(joint_state)
 
-    def publish_odom(self, base_pos, base_rot, robot_num):
+    def publish_odom(self, base_pos, base_rot, lin_vel, ang_vel, robot_num):
         odom_trans = TransformStamped()
         odom_trans.header.stamp = self.get_clock().now().to_msg()
         odom_trans.header.frame_id = "odom"
-        odom_trans.child_frame_id = f"robot{robot_num}/base_link"
+        odom_trans.child_frame_id = "odom"
         odom_trans.transform.translation.x = base_pos[0].item()
         odom_trans.transform.translation.y = base_pos[1].item()
         odom_trans.transform.translation.z = base_pos[2].item()
@@ -210,7 +212,7 @@ class RobotBaseNode(Node):
         odom_topic = Odometry()
         odom_topic.header.stamp = self.get_clock().now().to_msg()
         odom_topic.header.frame_id = "odom"
-        odom_topic.child_frame_id = f"robot{robot_num}/base_link"
+        odom_topic.child_frame_id = "odom"
         odom_topic.pose.pose.position.x = base_pos[0].item()
         odom_topic.pose.pose.position.y = base_pos[1].item()
         odom_topic.pose.pose.position.z = base_pos[2].item()
@@ -218,13 +220,28 @@ class RobotBaseNode(Node):
         odom_topic.pose.pose.orientation.y = base_rot[2].item()
         odom_topic.pose.pose.orientation.z = base_rot[3].item()
         odom_topic.pose.pose.orientation.w = base_rot[0].item()
+        odom_topic.twist.twist.linear.x = lin_vel[0].item()
+        odom_topic.twist.twist.linear.y = lin_vel[1].item()
+        odom_topic.twist.twist.linear.z = lin_vel[2].item()
+        odom_topic.twist.twist.angular.x = ang_vel[0].item()
+        odom_topic.twist.twist.angular.y = ang_vel[1].item()
+        odom_topic.twist.twist.angular.z = ang_vel[2].item()
         self.odom_pub[robot_num].publish(odom_topic)
 
-
+    def publish_twist(self, lin_vel, ang_vel, robot_num):
+        twist_topic = TwistWithCovariance()
+        twist_topic.twist.linear.x = lin_vel[0].item()
+        twist_topic.twist.linear.y = lin_vel[1].item()
+        twist_topic.twist.linear.z = lin_vel[2].item()
+        twist_topic.twist.angular.x = ang_vel[0].item()
+        twist_topic.twist.angular.y = ang_vel[1].item()
+        twist_topic.twist.angular.z = ang_vel[2].item()
+        self.twist_pub[robot_num].publish(twist_topic)
+        
     def publish_imu(self, base_rot, base_lin_vel, base_ang_vel, robot_num):
         imu_trans = Imu()
         imu_trans.header.stamp = self.get_clock().now().to_msg()
-        imu_trans.header.frame_id = f"robot{robot_num}/base_link"
+        imu_trans.header.frame_id = "base_link"
 
         imu_trans.linear_acceleration.x = base_lin_vel[0].item()
         imu_trans.linear_acceleration.y = base_lin_vel[1].item()
@@ -255,7 +272,8 @@ class RobotBaseNode(Node):
     def publish_lidar(self, points, robot_num):
 
         point_cloud = PointCloud2()
-        point_cloud.header = Header(frame_id="odom")
+        point_cloud.header = Header(frame_id="lidar_top")
+        point_cloud.header.stamp = self.get_clock().now().to_msg()        
         fields = [
             PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
             PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),

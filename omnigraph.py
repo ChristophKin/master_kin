@@ -26,38 +26,71 @@ import omni
 import omni.graph.core as og
 
 
-def create_front_cam_omnigraph(robot_num):
+def create_front_cam_omnigraph(robot_num, robot_type):
     """Define the OmniGraph for the Isaac Sim environment."""
 
     keys = og.Controller.Keys
 
     graph_path = f"/ROS_" + f"front_cam{robot_num}"
-    og.Controller.edit(
-        {
-            "graph_path": graph_path,
-            "evaluator_name": "execution",
-            "pipeline_stage": og.GraphPipelineStage.GRAPH_PIPELINE_STAGE_SIMULATION,
-        },
-        {
-            keys.CREATE_NODES: [
-                ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
-                ("IsaacCreateRenderProduct", "omni.isaac.core_nodes.IsaacCreateRenderProduct"),
-                ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),
-            ],
 
-            keys.SET_VALUES: [
-                ("IsaacCreateRenderProduct.inputs:cameraPrim", f"/World/envs/env_{robot_num}/Robot/base/front_cam"),
-                ("IsaacCreateRenderProduct.inputs:enabled", True),
-                ("ROS2CameraHelper.inputs:type", "rgb"),
-                ("ROS2CameraHelper.inputs:topicName", f"robot{robot_num}/front_cam/rgb"),
-                ("ROS2CameraHelper.inputs:frameId", f"robot{robot_num}"),
-            ],
+    if robot_type == "go2":
+        og.Controller.edit(
+            {
+                "graph_path": graph_path,
+                "evaluator_name": "execution",
+                "pipeline_stage": og.GraphPipelineStage.GRAPH_PIPELINE_STAGE_SIMULATION,
+            },
+            {
+                keys.CREATE_NODES: [
+                    ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
+                    ("IsaacCreateRenderProduct", "omni.isaac.core_nodes.IsaacCreateRenderProduct"),
+                    ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),
+                ],
 
-            keys.CONNECT: [
-                ("OnPlaybackTick.outputs:tick", "IsaacCreateRenderProduct.inputs:execIn"),
-                ("IsaacCreateRenderProduct.outputs:execOut", "ROS2CameraHelper.inputs:execIn"),
-                ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),
-            ],
+                keys.SET_VALUES: [
+                    ("IsaacCreateRenderProduct.inputs:cameraPrim", f"/World/envs/env_{robot_num}/Robot/base/front_cam"),
+                    ("IsaacCreateRenderProduct.inputs:enabled", True),
+                    ("ROS2CameraHelper.inputs:type", "rgb"),
+                    ("ROS2CameraHelper.inputs:topicName", f"robot/front_cam/rgb"),
+                    ("ROS2CameraHelper.inputs:frameId", f"robot"),
+                ],
 
-        },
-    )
+                keys.CONNECT: [
+                    ("OnPlaybackTick.outputs:tick", "IsaacCreateRenderProduct.inputs:execIn"),
+                    ("IsaacCreateRenderProduct.outputs:execOut", "ROS2CameraHelper.inputs:execIn"),
+                    ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),
+                ],
+
+            },
+        )
+
+    elif robot_type == "go1":
+        og.Controller.edit(
+            {
+                "graph_path": graph_path,
+                "evaluator_name": "execution",
+                "pipeline_stage": og.GraphPipelineStage.GRAPH_PIPELINE_STAGE_SIMULATION,
+            },
+            {
+                keys.CREATE_NODES: [
+                    ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
+                    ("IsaacCreateRenderProduct", "omni.isaac.core_nodes.IsaacCreateRenderProduct"),
+                    ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),
+                ],
+
+                keys.SET_VALUES: [
+                    ("IsaacCreateRenderProduct.inputs:cameraPrim", f"/World/envs/env_{robot_num}/Robot/trunk/front_cam"),
+                    ("IsaacCreateRenderProduct.inputs:enabled", True),
+                    ("ROS2CameraHelper.inputs:type", "rgb"),
+                    ("ROS2CameraHelper.inputs:topicName", f"robot/front_cam/rgb"),
+                    ("ROS2CameraHelper.inputs:frameId", f"robot"),
+                ],
+
+                keys.CONNECT: [
+                    ("OnPlaybackTick.outputs:tick", "IsaacCreateRenderProduct.inputs:execIn"),
+                    ("IsaacCreateRenderProduct.outputs:execOut", "ROS2CameraHelper.inputs:execIn"),
+                    ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),
+                ],
+
+            },
+        )

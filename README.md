@@ -90,11 +90,7 @@ Get ready to take your research to the next level with this powerful new resourc
 12. Added G1 Unitree support :white_check_mark:
 
 ## Your feedback and support mean the world to us. 
-
-If you're as enthusiastic about this project as we are, please consider giving it a :star: star on our GitHub repository. 
-
-Your encouragement fuels our passion and helps us develop our RoadMap further. We welcome any help or suggestions you can offer!
-
+OS1_REV6_32ch10hz2048res
 Together, let's push the boundaries of what's possible with the Unitree Go2/G1 and ROS2!
 
 

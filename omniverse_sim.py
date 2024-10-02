@@ -157,7 +157,7 @@ def cmd_vel_cb(msg, num_robot):
 def add_cmd_sub(num_envs):
     node_test = rclpy.create_node('position_velocity_publisher')
     for i in range(num_envs):
-        node_test.create_subscription(Twist, f'robot{i}/cmd_vel', lambda msg, i=i: cmd_vel_cb(msg, str(i)), 10)
+        node_test.create_subscription(Twist, 'robot/cmd_vel', lambda msg, i=i: cmd_vel_cb(msg, str(i)), 10)
     # Spin in a separate thread
     thread = threading.Thread(target=rclpy.spin, args=(node_test,), daemon=True)
     thread.start()
@@ -193,7 +193,7 @@ def run_sim():
 
     # create ros2 camera stream omnigraph
     for i in range(env_cfg.scene.num_envs):
-        create_front_cam_omnigraph(i)
+        create_front_cam_omnigraph(i, args_cli.robot)
         
     specify_cmd_for_robots(env_cfg.scene.num_envs)
 

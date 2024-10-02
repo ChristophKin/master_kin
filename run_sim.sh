@@ -25,12 +25,12 @@
 source /opt/ros/${ROS_DISTRO}/setup.bash
 cd IsaacSim-ros_workspaces/${ROS_DISTRO}_ws
 rosdep install --from-paths src --ignore-src -r -y
-colcon build
+colcon build #--cmake-clean-cache
 source install/setup.bash
 cd ../..
 cd go2_omniverse_ws
 rosdep install --from-paths src --ignore-src -r -y
-colcon build
+colcon build #--cmake-clean-cache
 source install/setup.bash
 cd ..
 
@@ -39,4 +39,6 @@ conda activate orbit
 export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6  ######
 
 # Run the Python script
-python main.py --robot go1 --terrain flat --custom_env office
+python main.py --robot go1 --terrain rough --custom_env littlepark #&
+
+# ros2 launch kiss_icp odometry.launch.py topic:=/sensing/lidar/top/points
