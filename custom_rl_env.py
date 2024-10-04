@@ -62,9 +62,8 @@ base_command = {}
 def constant_commands(env: RLTaskEnvCfg) -> torch.Tensor:
     global base_command
     """The generated command from the command generator."""
-    tensor_lst = torch.tensor([0.0, 0.0, 0.0], dtype=torch.float32, device=env.device).repeat(env.num_envs, 1)
-    for i in range(env.num_envs):
-        tensor_lst[i] = torch.tensor(base_command[str(i)], dtype=torch.float32, device=env.device)
+    tensor_lst = torch.tensor([0.0, 0.0, 0.0], dtype=torch.float32, device=env.device).repeat(1, 1)
+    tensor_lst[0] = torch.tensor(base_command["0"], dtype=torch.float32, device=env.device)
     return tensor_lst
 
 

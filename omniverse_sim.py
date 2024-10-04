@@ -21,7 +21,7 @@ parser.add_argument("--num_envs", type=int, default=1, help="Number of environme
 parser.add_argument("--task", type=str, default="Isaac-Velocity-Rough-Unitree-Go2-v0", help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--custom_env", type=str, default="office", help="Setup the environment")
-parser.add_argument("--robot", type=str, default="go2", help="Setup the robot")
+parser.add_argument("--robot", type=str, default="go1", help="Setup the robot")
 parser.add_argument("--terrain", type=str, default="rough", help="Setup the robot")
 parser.add_argument("--robot_amount", type=int, default=1, help="Setup the robot amount")
 
@@ -45,15 +45,6 @@ import omni
 
 ext_manager = omni.kit.app.get_app().get_extension_manager()
 ext_manager.set_extension_enabled_immediate("omni.isaac.ros2_bridge", True)
-
-# FOR VR SUPPORT
-# ext_manager.set_extension_enabled_immediate("omni.kit.xr.core", True)
-# ext_manager.set_extension_enabled_immediate("omni.kit.xr.system.steamvr", True)
-# ext_manager.set_extension_enabled_immediate("omni.kit.xr.system.simulatedxr", True)
-# ext_manager.set_extension_enabled_immediate("omni.kit.xr.system.openxr", True)
-# ext_manager.set_extension_enabled_immediate("omni.kit.xr.telemetry", True)
-# ext_manager.set_extension_enabled_immediate("omni.kit.xr.profile.vr", True)
-
 
 """Rest everything follows."""
 import gymnasium as gym
@@ -85,7 +76,7 @@ import custom_rl_env
 from omnigraph import create_front_cam_omnigraph
 
 
-def sub_keyboard_event(event, *args, **kwargs) -> bool:
+def sub_keyboard_event(event) -> bool:
 
     if len(custom_rl_env.base_command) > 0:
         if event.type == carb.input.KeyboardEventType.KEY_PRESS:
@@ -102,22 +93,8 @@ def sub_keyboard_event(event, *args, **kwargs) -> bool:
             if event.input.name == 'E':
                 custom_rl_env.base_command["0"] = [0, 0, -1]
 
-            if len(custom_rl_env.base_command) > 1:
-                if event.input.name == 'I':
-                    custom_rl_env.base_command["1"] = [1, 0, 0]
-                if event.input.name == 'K':
-                    custom_rl_env.base_command["1"] = [-1, 0, 0]
-                if event.input.name == 'J':
-                    custom_rl_env.base_command["1"] = [0, 1, 0]
-                if event.input.name == 'L':
-                    custom_rl_env.base_command["1"] = [0, -1, 0]
-                if event.input.name == 'U':
-                    custom_rl_env.base_command["1"] = [0, 0, 1]
-                if event.input.name == 'O':
-                    custom_rl_env.base_command["1"] = [0, 0, -1]
         elif event.type == carb.input.KeyboardEventType.KEY_RELEASE:
-            for i in range(len(custom_rl_env.base_command)):
-                custom_rl_env.base_command[str(i)] = [0, 0, 0]
+            custom_rl_env.base_command["0"] = [0, 0, 0]
     return True
 
 
@@ -147,26 +124,23 @@ def setup_custom_env():
         print("Error loading custom environment. You should download custom envs folder from: https://drive.google.com/drive/folders/1vVGuO1KIX1K6mD6mBHDZGm9nk2vaRyj3?usp=sharing")
 
 
-def cmd_vel_cb(msg, num_robot):
+def cmd_vel_cb(msg):
     x = msg.linear.x
     y = msg.linear.y
     z = msg.angular.z
-    custom_rl_env.base_command[str(num_robot)] = [x, y, z]
+    custom_rl_env.base_command["0"] = [x, y, z]
 
 
-def add_cmd_sub(num_envs):
+def add_cmd_sub():
     node_test = rclpy.create_node('position_velocity_publisher')
-    for i in range(num_envs):
-        node_test.create_subscription(Twist, 'robot/cmd_vel', lambda msg, i=i: cmd_vel_cb(msg, str(i)), 10)
+    node_test.create_subscription(Twist, 'robot/cmd_vel', lambda msg, i=1: cmd_vel_cb(msg), 10)
     # Spin in a separate thread
     thread = threading.Thread(target=rclpy.spin, args=(node_test,), daemon=True)
     thread.start()
 
 
-def specify_cmd_for_robots(numv_envs):
-    for i in range(numv_envs):
-        custom_rl_env.base_command[str(i)] = [0, 0, 0]
-
+def specify_cmd_for_robots():
+    custom_rl_env.base_command["0"] = [0, 0, 0]
 
 def run_sim():
     
@@ -189,13 +163,12 @@ def run_sim():
         env_cfg = UnitreeGo2CustomEnvCfg()
 
     # add N robots to env 
-    env_cfg.scene.num_envs = args_cli.robot_amount
+    env_cfg.scene.num_envs = 1
 
     # create ros2 camera stream omnigraph
-    for i in range(env_cfg.scene.num_envs):
-        create_front_cam_omnigraph(i, args_cli.robot)
+    create_front_cam_omnigraph(args_cli.robot)
         
-    specify_cmd_for_robots(env_cfg.scene.num_envs)
+    specify_cmd_for_robots()
 
     if args_cli.robot == "go1":
         agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go1_agent_cfg
@@ -231,11 +204,11 @@ def run_sim():
 
     # initialize ROS2 node
     rclpy.init()
-    base_node = RobotBaseNode(env_cfg.scene.num_envs)
-    add_cmd_sub(env_cfg.scene.num_envs)
+    base_node = RobotBaseNode()
+    add_cmd_sub()
 
-    annotator_lst = add_rtx_lidar(env_cfg.scene.num_envs, args_cli.robot, False)
-    add_camera(env_cfg.scene.num_envs, args_cli.robot)
+    annotator_lst = add_rtx_lidar(args_cli.robot, False)
+    add_camera(args_cli.robot)
     setup_custom_env()
 
     # render settings interface
@@ -257,5 +230,5 @@ def run_sim():
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
-            pub_robo_data_ros2(args_cli.robot, env_cfg.scene.num_envs, base_node, env, annotator_lst, start_time)
+            pub_robo_data_ros2(args_cli.robot, base_node, env, annotator_lst, start_time)
     env.close()

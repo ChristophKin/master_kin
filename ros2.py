@@ -38,7 +38,7 @@ from std_msgs.msg import Header
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2, PointField, Imu
 from sensor_msgs_py import point_cloud2
-from geometry_msgs.msg import TwistWithCovariance
+from geometry_msgs.msg import TwistWithCovarianceStamped
 
 
 from omni.isaac.orbit.sensors import CameraCfg, Camera
@@ -50,7 +50,6 @@ import omni.isaac.orbit.sim as sim_utils
 
 
 def update_meshes_for_cloud2(position_array, origin, rot):
-
     q = rot.cpu().numpy()
     rotation = Rotation.from_quat([q[1], q[2], q[3], q[0]])
     rotated_vectors = rotation.apply(position_array)
@@ -60,105 +59,100 @@ def update_meshes_for_cloud2(position_array, origin, rot):
     return rotated_vectors
 
 
-def add_rtx_lidar(num_envs, robot_type, debug=False):
+def add_rtx_lidar(robot_type, debug=False):
     annotator_lst = []
-    for i in range(num_envs):
-        if robot_type == "g1":
-            lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/head_link/lidar_sensor',
-                                    rotation_frequency = 200,
-                                    pulse_time=1, 
-                                    translation=(0.0, 0.0, 0.0),
-                                    orientation=(1.0, 0.0, 0.0, 0.0),
-                                    config_file_name= "Unitree_L1",
+    if robot_type == "g1":
+        lidar_sensor = LidarRtx(f'/World/envs/env_0/Robot/head_link/lidar_sensor',
+                                rotation_frequency = 200,
+                                pulse_time=1, 
+                                translation=(0.0, 0.0, 0.0),
+                                orientation=(1.0, 0.0, 0.0, 0.0),
+                                config_file_name= "Unitree_L1",
+                            )
+    
+    elif robot_type == "go1":
+        lidar_sensor = LidarRtx(f'/World/envs/env_0/Robot/trunk/lidar_sensor',
+                                rotation_frequency = 200,
+                                pulse_time=1, 
+                                translation=(0.0, 0.0, 0.4),
+                                orientation=(1.0, 0.0, 0.0, 0.0),
+                                #config_file_name= "Unitree_L1",
+                                config_file_name= "OS1_REV6_32ch20hz1024res", 
                                 )
-        
-        elif robot_type == "go1":
-            lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/trunk/lidar_sensor',
-                                    rotation_frequency = 200,
-                                    pulse_time=1, 
-                                    translation=(0.0, 0.0, 0.4),
-                                    orientation=(1.0, 0.0, 0.0, 0.0),
-                                    #config_file_name= "Unitree_L1",
-                                    config_file_name= "OS1_REV6_32ch20hz1024res", 
-                                    )
 
-        else:
-            lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/base/lidar_sensor',
-                                    rotation_frequency = 200,
-                                    pulse_time=1, 
-                                    translation=(0.0, 0.0, 0.4),
-                                    orientation=(1.0, 0.0, 0.0, 0.0),
-                                    config_file_name= "Unitree_L1",
-                                    )
+    else:
+        lidar_sensor = LidarRtx(f'/World/envs/env_0/Robot/base/lidar_sensor',
+                                rotation_frequency = 200,
+                                pulse_time=1, 
+                                translation=(0.0, 0.0, 0.4),
+                                orientation=(1.0, 0.0, 0.0, 0.0),
+                                config_file_name= "Unitree_L1",
+                                )
 
-        if debug:
-            # Create the debug draw pipeline in the post process graph
-            writer = rep.writers.get("RtxLidar" + "DebugDrawPointCloudBuffer")
-            writer.attach([lidar_sensor.get_render_product_path()])
+    if debug:
+        # Create the debug draw pipeline in the post process graph
+        writer = rep.writers.get("RtxLidar" + "DebugDrawPointCloudBuffer")
+        writer.attach([lidar_sensor.get_render_product_path()])
 
-        annotator = rep.AnnotatorRegistry.get_annotator("RtxSensorCpuIsaacCreateRTXLidarScanBuffer")
-        annotator.attach(lidar_sensor.get_render_product_path())
-        annotator_lst.append(annotator)
+    annotator = rep.AnnotatorRegistry.get_annotator("RtxSensorCpuIsaacCreateRTXLidarScanBuffer")
+    annotator.attach(lidar_sensor.get_render_product_path())
+    annotator_lst.append(annotator)
     return annotator_lst
 
 
-def add_camera(num_envs, robot_type):
-    for i in range(num_envs):
-        cameraCfg = CameraCfg(
-            prim_path=f"/World/envs/env_{i}/Robot/base/front_cam",
-            update_period=0.1,
-            height=480,
-            width=640,
-            data_types=["rgb"],
-            spawn=sim_utils.PinholeCameraCfg(
-                focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
-            ),
-            offset=CameraCfg.OffsetCfg(pos=(0.32487, -0.00095, 0.05362), rot=(0.5, -0.5, 0.5, -0.5), convention="ros"),
-        )
+def add_camera(robot_type):
+    cameraCfg = CameraCfg(
+        prim_path=f"/World/envs/env_0/Robot/base/front_cam",
+        update_period=0.1,
+        height=480,
+        width=640,
+        data_types=["rgb"],
+        spawn=sim_utils.PinholeCameraCfg(
+            focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
+        ),
+        offset=CameraCfg.OffsetCfg(pos=(0.32487, -0.00095, 0.05362), rot=(0.5, -0.5, 0.5, -0.5), convention="ros"),
+    )
 
-        if robot_type == "g1":
-            cameraCfg.prim_path = f"/World/envs/env_{i}/Robot/head_link/front_cam"
-            cameraCfg.offset = CameraCfg.OffsetCfg(pos=(0.0, 0.0, 0.0), rot=(0.5, -0.5, 0.5, -0.5), convention="ros")
+    if robot_type == "g1":
+        cameraCfg.prim_path = f"/World/envs/env_0/Robot/head_link/front_cam"
+        cameraCfg.offset = CameraCfg.OffsetCfg(pos=(0.0, 0.0, 0.0), rot=(0.5, -0.5, 0.5, -0.5), convention="ros")
 
-        elif robot_type == "go1":
-            cameraCfg.prim_path = f"/World/envs/env_{i}/Robot/trunk/front_cam"
+    elif robot_type == "go1":
+        cameraCfg.prim_path = f"/World/envs/env_0/Robot/trunk/front_cam"
 
-        Camera(cameraCfg)
+    Camera(cameraCfg)
 
 
-def pub_robo_data_ros2(robot_type, num_envs, base_node, env, annotator_lst, start_time):
-
-    for i in range(num_envs):
-        # publish ros2 info
-        base_node.publish_joints(env.env.scene["robot"].data.joint_names, env.env.scene["robot"].data.joint_pos[i], i)
-        base_node.publish_odom(env.env.scene["robot"].data.root_state_w[i, :3], env.env.scene["robot"].data.root_state_w[i, 3:7], env.env.scene["robot"].data.root_state_w[i, 7:10], env.env.scene["robot"].data.root_state_w[i, 10:],i)
-        base_node.publish_imu(env.env.scene["robot"].data.root_state_w[i, 3:7], env.env.scene["robot"].data.root_lin_vel_b[i, :], env.env.scene["robot"].data.root_ang_vel_b[i, :], i)
-        base_node.publish_twist(env.env.scene["robot"].data.root_state_w[i, 7:10], env.env.scene["robot"].data.root_state_w[i, 10:],i)
-        '''
-        if robot_type == "go2":
-            base_node.publish_robot_state([
-                env.env.scene["contact_forces"].data.net_forces_w[i][4][2], 
-                env.env.scene["contact_forces"].data.net_forces_w[i][8][2], 
-                env.env.scene["contact_forces"].data.net_forces_w[i][14][2], 
-                env.env.scene["contact_forces"].data.net_forces_w[i][18][2]
-                ], i)
-        '''
-        try:
-            if (time.time() - start_time) > 1/20:
-                for j in range(num_envs):
-                    data = annotator_lst[j].get_data()
-                    point_cloud = update_meshes_for_cloud2(
-                        data['data'], env.env.scene["robot"].data.root_state_w[j, :3], 
-                        env.env.scene["robot"].data.root_state_w[j, 3:7]
-                        )
-                    base_node.publish_lidar(point_cloud, j)
-                start_time = time.time()
-        except :
-            pass
+def pub_robo_data_ros2(robot_type, base_node, env, annotator_lst, start_time):
+    # publish ros2 info
+    base_node.publish_joints(env.env.scene["robot"].data.joint_names, env.env.scene["robot"].data.joint_pos[0])
+    base_node.publish_odom(env.env.scene["robot"].data.root_state_w[0, :3], env.env.scene["robot"].data.root_state_w[0, 3:7], env.env.scene["robot"].data.root_state_w[0, 7:10], env.env.scene["robot"].data.root_state_w[0, 10:])
+    base_node.publish_imu(env.env.scene["robot"].data.root_state_w[0, 3:7], env.env.scene["robot"].data.root_lin_vel_b[0, :], env.env.scene["robot"].data.root_ang_vel_b[0, :])
+    base_node.publish_twist(env.env.scene["robot"].data.root_state_w[0, 7:10], env.env.scene["robot"].data.root_state_w[0, 10:])
+    '''
+    if robot_type == "go2":
+        base_node.publish_robot_state([
+            env.env.scene["contact_forces"].data.net_forces_w[i][4][2], 
+            env.env.scene["contact_forces"].data.net_forces_w[i][8][2], 
+            env.env.scene["contact_forces"].data.net_forces_w[i][14][2], 
+            env.env.scene["contact_forces"].data.net_forces_w[i][18][2]
+            ], i)
+    '''
+    try:
+        if (time.time() - start_time) > 1/20:
+            data = annotator_lst[0].get_data()
+            point_cloud = update_meshes_for_cloud2(
+                data['data'], env.env.scene["robot"].data.root_state_w[0, :3], 
+                env.env.scene["robot"].data.root_state_w[0, 3:7]
+                )
+            base_node.publish_lidar(point_cloud)
+            start_time = time.time()
+    except :
+        pass
 
 
 class RobotBaseNode(Node):
-    def __init__(self, num_envs):
+    def __init__(self):
         super().__init__('go2_driver_node')
         qos_profile = QoSProfile(depth=10)
 
@@ -169,16 +163,15 @@ class RobotBaseNode(Node):
         self.imu_pub = []
         self.twist_pub = []
 
-        for i in range(num_envs):
-            self.joint_pub.append(self.create_publisher(JointState, 'robot/joint_states', qos_profile))
-            #self.go2_state_pub.append(self.create_publisher(Go2State, f'robot/go2_states', qos_profile))
-            self.go2_lidar_pub.append(self.create_publisher(PointCloud2, '/sensing/lidar/top/points', qos_profile))
-            self.odom_pub.append(self.create_publisher(Odometry, 'sensing/odom/odom_data', qos_profile))
-            self.imu_pub.append(self.create_publisher(Imu, '/sensing/imu/imu_data', qos_profile))
-            self.twist_pub.append(self.create_publisher(TwistWithCovariance, '/sensing/odom/twist_data', qos_profile))
+        self.joint_pub.append(self.create_publisher(JointState, 'robot/joint_states', qos_profile))
+        #self.go2_state_pub.append(self.create_publisher(Go2State, f'robot/go2_states', qos_profile))
+        self.go2_lidar_pub.append(self.create_publisher(PointCloud2, '/sensing/lidar/top/points', qos_profile))
+        self.odom_pub.append(self.create_publisher(Odometry, 'sensing/odom/odom_data', qos_profile))
+        self.imu_pub.append(self.create_publisher(Imu, '/sensing/imu/imu_data', qos_profile))
+        self.twist_pub.append(self.create_publisher(TwistWithCovarianceStamped, '/localization/twist_estimator/twist_with_covariance', qos_profile))
         self.broadcaster= TransformBroadcaster(self, qos=qos_profile)
         
-    def publish_joints(self, joint_names_lst, joint_state_lst, robot_num):
+    def publish_joints(self, joint_names_lst, joint_state_lst):
         # Create message
         joint_state = JointState()
         joint_state.header.stamp = self.get_clock().now().to_msg()
@@ -193,9 +186,9 @@ class RobotBaseNode(Node):
 
         joint_state.name = joint_state_names_formated
         joint_state.position = joint_state_formated
-        self.joint_pub[robot_num].publish(joint_state)
+        self.joint_pub[0].publish(joint_state)
 
-    def publish_odom(self, base_pos, base_rot, lin_vel, ang_vel, robot_num):
+    def publish_odom(self, base_pos, base_rot, lin_vel, ang_vel):
         odom_trans = TransformStamped()
         odom_trans.header.stamp = self.get_clock().now().to_msg()
         odom_trans.header.frame_id = "odom"
@@ -226,19 +219,21 @@ class RobotBaseNode(Node):
         odom_topic.twist.twist.angular.x = ang_vel[0].item()
         odom_topic.twist.twist.angular.y = ang_vel[1].item()
         odom_topic.twist.twist.angular.z = ang_vel[2].item()
-        self.odom_pub[robot_num].publish(odom_topic)
+        self.odom_pub[0].publish(odom_topic)
 
-    def publish_twist(self, lin_vel, ang_vel, robot_num):
-        twist_topic = TwistWithCovariance()
-        twist_topic.twist.linear.x = lin_vel[0].item()
-        twist_topic.twist.linear.y = lin_vel[1].item()
-        twist_topic.twist.linear.z = lin_vel[2].item()
-        twist_topic.twist.angular.x = ang_vel[0].item()
-        twist_topic.twist.angular.y = ang_vel[1].item()
-        twist_topic.twist.angular.z = ang_vel[2].item()
-        self.twist_pub[robot_num].publish(twist_topic)
+    def publish_twist(self, lin_vel, ang_vel):
+        twist_topic = TwistWithCovarianceStamped()
+        twist_topic.header.stamp = self.get_clock().now().to_msg()
+        twist_topic.header.frame_id = "base_link"
+        twist_topic.twist.twist.linear.x = lin_vel[0].item()
+        twist_topic.twist.twist.linear.y = lin_vel[1].item()
+        twist_topic.twist.twist.linear.z = lin_vel[2].item()
+        twist_topic.twist.twist.angular.x = ang_vel[0].item()
+        twist_topic.twist.twist.angular.y = ang_vel[1].item()
+        twist_topic.twist.twist.angular.z = ang_vel[2].item()
+        self.twist_pub[0].publish(twist_topic)
         
-    def publish_imu(self, base_rot, base_lin_vel, base_ang_vel, robot_num):
+    def publish_imu(self, base_rot, base_lin_vel, base_ang_vel):
         imu_trans = Imu()
         imu_trans.header.stamp = self.get_clock().now().to_msg()
         imu_trans.header.frame_id = "base_link"
@@ -256,9 +251,9 @@ class RobotBaseNode(Node):
         imu_trans.orientation.z = base_rot[3].item()
         imu_trans.orientation.w = base_rot[0].item()
         
-        self.imu_pub[robot_num].publish(imu_trans)
+        self.imu_pub[0].publish(imu_trans)
 
-    def publish_robot_state(self, foot_force_lst, robot_num):
+    def publish_robot_state(self, foot_force_lst):
 
         go2_state = Go2State()
         go2_state.foot_force = [
@@ -266,11 +261,9 @@ class RobotBaseNode(Node):
             int(foot_force_lst[1].item()), 
             int(foot_force_lst[2].item()), 
             int(foot_force_lst[3].item())]
-        self.go2_state_pub[robot_num].publish(go2_state) 
+        self.go2_state_pub[0].publish(go2_state) 
 
-
-    def publish_lidar(self, points, robot_num):
-
+    def publish_lidar(self, points):
         point_cloud = PointCloud2()
         point_cloud.header = Header(frame_id="lidar_top")
         point_cloud.header.stamp = self.get_clock().now().to_msg()        
@@ -283,7 +276,7 @@ class RobotBaseNode(Node):
             #PointField(name='c', offset=14, datatype=PointField.UINT16, count=1),
         ]
         point_cloud = point_cloud2.create_cloud(point_cloud.header, fields, points)
-        self.go2_lidar_pub[robot_num].publish(point_cloud)
+        self.go2_lidar_pub[0].publish(point_cloud)
 
 
     async def run(self):
