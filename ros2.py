@@ -76,7 +76,7 @@ def add_rtx_lidar(num_envs, robot_type, debug=False):
             lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/trunk/lidar_sensor',
                                     rotation_frequency = 200,
                                     pulse_time=1, 
-                                    translation=(0.0, 0, 0.4),
+                                    translation=(0.0, 0.0, 0.4),
                                     orientation=(1.0, 0.0, 0.0, 0.0),
                                     #config_file_name= "Unitree_L1",
                                     config_file_name= "OS1_REV6_32ch20hz1024res", 
@@ -86,7 +86,7 @@ def add_rtx_lidar(num_envs, robot_type, debug=False):
             lidar_sensor = LidarRtx(f'/World/envs/env_{i}/Robot/base/lidar_sensor',
                                     rotation_frequency = 200,
                                     pulse_time=1, 
-                                    translation=(0.0, 0, 0.4),
+                                    translation=(0.0, 0.0, 0.4),
                                     orientation=(1.0, 0.0, 0.0, 0.0),
                                     config_file_name= "Unitree_L1",
                                     )
@@ -278,6 +278,9 @@ class RobotBaseNode(Node):
             PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
             PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
             PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+            #PointField(name='i', offset=12, datatype=PointField.UINT8, count=1),
+            #PointField(name='r', offset=13, datatype=PointField.UINT8, count=1),
+            #PointField(name='c', offset=14, datatype=PointField.UINT16, count=1),
         ]
         point_cloud = point_cloud2.create_cloud(point_cloud.header, fields, points)
         self.go2_lidar_pub[robot_num].publish(point_cloud)

@@ -39,6 +39,4 @@ conda activate orbit
 export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6  ######
 
 # Run the Python script
-python main.py --robot go1 --terrain rough --custom_env littlepark #&
-
-# ros2 launch kiss_icp odometry.launch.py topic:=/sensing/lidar/top/points
+python main.py --robot go1 --terrain rough --custom_env littlepark
