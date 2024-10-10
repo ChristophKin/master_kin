@@ -85,9 +85,9 @@ def sub_keyboard_event(event) -> bool:
             if event.input.name == 'S':
                 custom_rl_env.base_command["0"] = [-1, 0, 0]
             if event.input.name == 'A':
-                custom_rl_env.base_command["0"] = [0, 1, 0]
+                custom_rl_env.base_command["0"] = [1, 0, 1]
             if event.input.name == 'D':
-                custom_rl_env.base_command["0"] = [0, -1, 0]
+                custom_rl_env.base_command["0"] = [1, 0, -1]
             if event.input.name == 'Q':
                 custom_rl_env.base_command["0"] = [0, 0, 1]
             if event.input.name == 'E':
@@ -100,9 +100,9 @@ def sub_keyboard_event(event) -> bool:
 
 def setup_custom_env():
     try:
-        if (args_cli.custom_env == "warehouse" and args_cli.terrain == 'flat'):
-            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/warehouse.usd")
-            cfg_scene.func("/World/warehouse", cfg_scene, translation=(0.0, 0.0, 0.0))
+        if (args_cli.custom_env == "little_park" and args_cli.terrain == 'rough'):
+            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/littlepark_cars.usd")
+            cfg_scene.func("/World/littlepark", cfg_scene, translation=(0.0, 0.0, 0.0))
 
         if (args_cli.custom_env == "office" and args_cli.terrain == 'flat'):
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/office_walls.usd")
@@ -116,10 +116,6 @@ def setup_custom_env():
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/brownstone.usd")
             cfg_scene.func("/World/brownstone", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "littlepark" and args_cli.terrain == 'rough'):
-            cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/littlepark.usd")
-            cfg_scene.func("/World/littlepark", cfg_scene, translation=(0.0, 0.0, 0.0))
-            
     except:
         print("Error loading custom environment. You should download custom envs folder from: https://drive.google.com/drive/folders/1vVGuO1KIX1K6mD6mBHDZGm9nk2vaRyj3?usp=sharing")
 
@@ -217,7 +213,7 @@ def run_sim():
     set_carb_setting(carb_settings, "/rtx/ecoMode/enabled", True)
     set_carb_setting(carb_settings, "/rtx/indirectDiffuse/enabled", False)
     set_carb_setting(carb_settings, "/rtx/ambientOcclusion/enabled", False)
-    set_carb_setting(carb_settings, "/rtx/reflections/enabled", False)
+    set_carb_setting(carb_settings, "/rtx/reflections/enabled", True)
     set_carb_setting(carb_settings, "/rtx/raytracing/subsurface/enabled", False)
 
 
@@ -230,5 +226,5 @@ def run_sim():
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
-            pub_robo_data_ros2(args_cli.robot, base_node, env, annotator_lst, start_time)
+            pub_robo_data_ros2(base_node, env, annotator_lst, start_time)
     env.close()
