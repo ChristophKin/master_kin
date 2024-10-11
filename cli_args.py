@@ -21,21 +21,15 @@ def add_rsl_rl_args(parser: argparse.ArgumentParser):
     # create a new argument group
     arg_group = parser.add_argument_group("rsl_rl", description="Arguments for RSL-RL agent.")
     # -- experiment arguments
-    arg_group.add_argument(
-        "--experiment_name", type=str, default=None, help="Name of the experiment folder where logs will be stored."
-    )
+    arg_group.add_argument("--experiment_name", type=str, default=None, help="Name of the experiment folder where logs will be stored.")
     arg_group.add_argument("--run_name", type=str, default=None, help="Run name suffix to the log directory.")
     # -- load arguments
     arg_group.add_argument("--resume", type=bool, default=None, help="Whether to resume from a checkpoint.")
     arg_group.add_argument("--load_run", type=str, default=None, help="Name of the run folder to resume from.")
     arg_group.add_argument("--checkpoint", type=str, default=None, help="Checkpoint file to resume from.")
     # -- logger arguments
-    arg_group.add_argument(
-        "--logger", type=str, default=None, choices={"wandb", "tensorboard", "neptune"}, help="Logger module to use."
-    )
-    arg_group.add_argument(
-        "--log_project_name", type=str, default=None, help="Name of the logging project when using wandb or neptune."
-    )
+    arg_group.add_argument("--logger", type=str, default=None, choices={"wandb", "tensorboard", "neptune"}, help="Logger module to use.")
+    arg_group.add_argument("--log_project_name", type=str, default=None, help="Name of the logging project when using wandb or neptune.")
 
 
 def parse_rsl_rl_cfg(task_name: str, args_cli: argparse.Namespace) -> RslRlOnPolicyRunnerCfg:

@@ -37,10 +37,10 @@ conda activate orbit
 export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
 # Run the main Python script with arguments:
-# --robot: go1, go2 or g1
-# --terrain: flat or rough
+# --robot: go1 or go2
 # --custom_env: little_park, office or warehouse_full
-python main.py --robot go1 --terrain rough --custom_env little_park &
+python main.py --robot go2 --custom_env little_park &
 
 # Execute a external shell script to run the point cloud modifier.
+# This is to make the published Lidar data format from Isaac suitable for Autoware.
 /home/kinbergeradm/pointcloud_processor/run_pointcloudmodifier.sh

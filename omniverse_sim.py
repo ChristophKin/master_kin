@@ -1,17 +1,14 @@
 """Script to play a checkpoint if an RL agent from RSL-RL."""
 from __future__ import annotations
 
-
 """Launch Isaac Sim Simulator first."""
 import argparse
 from omni.isaac.orbit.app import AppLauncher
-
 
 import cli_args  
 import time
 import os
 import threading
-
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Train an RL agent with RSL-RL.")
@@ -25,23 +22,18 @@ parser.add_argument("--robot", type=str, default="go1", help="Setup the robot")
 parser.add_argument("--terrain", type=str, default="rough", help="Setup the robot")
 parser.add_argument("--robot_amount", type=int, default=1, help="Setup the robot amount")
 
-
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
-
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
-
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
-
 import omni
-
 
 ext_manager = omni.kit.app.get_app().get_extension_manager()
 ext_manager.set_extension_enabled_immediate("omni.isaac.ros2_bridge", True)
@@ -52,32 +44,24 @@ import torch
 import carb
 from omni.isaac.core.utils.carb import set_carb_setting
 
-
 from omni.isaac.orbit_tasks.utils import get_checkpoint_path
-from omni.isaac.orbit_tasks.utils.wrappers.rsl_rl import (
-    RslRlOnPolicyRunnerCfg,
-    RslRlVecEnvWrapper
-)
+from omni.isaac.orbit_tasks.utils.wrappers.rsl_rl import (RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper)
 import omni.isaac.orbit.sim as sim_utils
 import omni.appwindow
 from rsl_rl.runners import OnPolicyRunner
-
-
 
 import rclpy
 from ros2 import RobotBaseNode, add_camera, add_rtx_lidar, pub_robo_data_ros2
 from geometry_msgs.msg import Twist
 
-
-from agent_cfg import unitree_go2_agent_cfg, unitree_g1_agent_cfg, unitree_go1_agent_cfg
-from custom_rl_env import UnitreeGo2CustomEnvCfg, G1RoughEnvCfg, UnitreeGo1CustomEnvCfg
+from agent_cfg import unitree_go2_agent_cfg, unitree_go1_agent_cfg
+from custom_rl_env import UnitreeGo2CustomEnvCfg, UnitreeGo1CustomEnvCfg
 import custom_rl_env
 
 from omnigraph import create_front_cam_omnigraph
 
 
 def sub_keyboard_event(event) -> bool:
-
     if len(custom_rl_env.base_command) > 0:
         if event.type == carb.input.KeyboardEventType.KEY_PRESS:
             if event.input.name == 'W':
@@ -100,24 +84,24 @@ def sub_keyboard_event(event) -> bool:
 
 def setup_custom_env():
     try:
-        if (args_cli.custom_env == "little_park" and args_cli.terrain == 'rough'):
+        if args_cli.custom_env == "little_park":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/littlepark_cars.usd")
             cfg_scene.func("/World/littlepark", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "office" and args_cli.terrain == 'flat'):
+        if args_cli.custom_env == "office":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/office_walls.usd")
             cfg_scene.func("/World/office", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "warehouse_full" and args_cli.terrain == 'flat'):
+        if args_cli.custom_env == "warehouse_full":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/warehouse_full.usd")
             cfg_scene.func("/World/warehouse_full", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if (args_cli.custom_env == "brownstone" and args_cli.terrain == 'flat'):
+        if args_cli.custom_env == "brownstone":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/brownstone.usd")
             cfg_scene.func("/World/brownstone", cfg_scene, translation=(0.0, 0.0, 0.0))
 
     except:
-        print("Error loading custom environment. You should download custom envs folder from: https://drive.google.com/drive/folders/1vVGuO1KIX1K6mD6mBHDZGm9nk2vaRyj3?usp=sharing")
+        print("[ERROR]: Exception loading custom environment.")
 
 
 def cmd_vel_cb(msg):
@@ -138,8 +122,8 @@ def add_cmd_sub():
 def specify_cmd_for_robots():
     custom_rl_env.base_command["0"] = [0, 0, 0]
 
+
 def run_sim():
-    
     # acquire input interface
     _input = carb.input.acquire_input_interface()
     _appwindow = omni.appwindow.get_default_app_window()
@@ -148,13 +132,8 @@ def run_sim():
 
     """Play with RSL-RL agent."""
     # parse configuration
-    
     if args_cli.robot == "go1":
         env_cfg = UnitreeGo1CustomEnvCfg() 
-    
-    elif args_cli.robot == "g1":
-        env_cfg = G1RoughEnvCfg()
-
     else:
         env_cfg = UnitreeGo2CustomEnvCfg()
 
@@ -168,10 +147,6 @@ def run_sim():
 
     if args_cli.robot == "go1":
         agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go1_agent_cfg
-
-    elif args_cli.robot == "g1":
-        agent_cfg: RslRlOnPolicyRunnerCfg = unitree_g1_agent_cfg
-
     else:
         agent_cfg: RslRlOnPolicyRunnerCfg = unitree_go2_agent_cfg
 
@@ -215,7 +190,6 @@ def run_sim():
     set_carb_setting(carb_settings, "/rtx/ambientOcclusion/enabled", False)
     set_carb_setting(carb_settings, "/rtx/reflections/enabled", True)
     set_carb_setting(carb_settings, "/rtx/raytracing/subsurface/enabled", False)
-
 
     start_time = time.time()
     # simulate environment

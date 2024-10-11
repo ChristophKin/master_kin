@@ -21,10 +21,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-import omni
 import omni.graph.core as og
-
 
 def create_front_cam_omnigraph(robot_type):
     """Define the OmniGraph for the Isaac Sim environment."""
@@ -44,23 +41,19 @@ def create_front_cam_omnigraph(robot_type):
                 keys.CREATE_NODES: [
                     ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
                     ("IsaacCreateRenderProduct", "omni.isaac.core_nodes.IsaacCreateRenderProduct"),
-                    ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),
-                ],
+                    ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),],
 
                 keys.SET_VALUES: [
                     ("IsaacCreateRenderProduct.inputs:cameraPrim", f"/World/envs/env_0/Robot/base/front_cam"),
                     ("IsaacCreateRenderProduct.inputs:enabled", True),
                     ("ROS2CameraHelper.inputs:type", "rgb"),
                     ("ROS2CameraHelper.inputs:topicName", f"robot/front_cam/rgb"),
-                    ("ROS2CameraHelper.inputs:frameId", f"robot"),
-                ],
+                    ("ROS2CameraHelper.inputs:frameId", f"robot"),],
 
                 keys.CONNECT: [
                     ("OnPlaybackTick.outputs:tick", "IsaacCreateRenderProduct.inputs:execIn"),
                     ("IsaacCreateRenderProduct.outputs:execOut", "ROS2CameraHelper.inputs:execIn"),
-                    ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),
-                ],
-
+                    ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),],
             },
         )
 
@@ -75,22 +68,18 @@ def create_front_cam_omnigraph(robot_type):
                 keys.CREATE_NODES: [
                     ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
                     ("IsaacCreateRenderProduct", "omni.isaac.core_nodes.IsaacCreateRenderProduct"),
-                    ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),
-                ],
+                    ("ROS2CameraHelper", "omni.isaac.ros2_bridge.ROS2CameraHelper"),],
 
                 keys.SET_VALUES: [
                     ("IsaacCreateRenderProduct.inputs:cameraPrim", f"/World/envs/env_0/Robot/trunk/front_cam"),
                     ("IsaacCreateRenderProduct.inputs:enabled", True),
                     ("ROS2CameraHelper.inputs:type", "rgb"),
                     ("ROS2CameraHelper.inputs:topicName", f"robot/front_cam/rgb"),
-                    ("ROS2CameraHelper.inputs:frameId", f"robot"),
-                ],
+                    ("ROS2CameraHelper.inputs:frameId", f"robot"),],
 
                 keys.CONNECT: [
                     ("OnPlaybackTick.outputs:tick", "IsaacCreateRenderProduct.inputs:execIn"),
                     ("IsaacCreateRenderProduct.outputs:execOut", "ROS2CameraHelper.inputs:execIn"),
-                    ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),
-                ],
-
+                    ("IsaacCreateRenderProduct.outputs:renderProductPath", "ROS2CameraHelper.inputs:renderProductPath"),],
             },
         )
