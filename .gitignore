@@ -6,3 +6,4 @@ __pycache__
 .env
 IsaacSim-ros_workspaces/build_ws
 envs
+logs/rsl_rl/unitree_go1_rough/2024-04-02_17-03-26_heightmap
