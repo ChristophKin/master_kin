@@ -13,18 +13,6 @@ colcon build #--cmake-clean-cache
 source install/setup.bash
 
 cd ../..
-cd go2_omniverse_ws
-
-# Install the necessary dependencies for this workspace
-rosdep install --from-paths src --ignore-src -r -y
-
-# colcon build compiles all packages. Optionally, '--cmake-clean-cache' can be uncommented to clean the cache before building.
-colcon build #--cmake-clean-cache
-
-# Source the workspace to make the built packages available for use
-source install/setup.bash
-
-cd ..
 
 # Initialize Conda shell environment and hook it into the current shell session
 eval "$(conda shell.bash hook)"
@@ -39,7 +27,7 @@ export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 # Run the main Python script with arguments:
 # --robot: go1 or go2
 # --custom_env: little_park, office or warehouse_full
-python main.py --robot go2 --custom_env little_park &
+python main.py --robot go1 --custom_env little_park &
 
 # Execute a external shell script to run the point cloud modifier.
 # This is to make the published Lidar data format from Isaac suitable for Autoware.

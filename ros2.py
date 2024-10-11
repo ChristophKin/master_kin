@@ -111,7 +111,7 @@ def pub_robo_data_ros2(base_node, env, annotator_lst, start_time):
 
 class RobotBaseNode(Node):
     def __init__(self):
-        super().__init__('go2_driver_node')
+        super().__init__('go_driver_node')
         qos_profile = QoSProfile(depth=10)
 
         self.go2_lidar_pub = []
