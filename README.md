@@ -1,184 +1,67 @@
-![Digital Twins](https://github.com/abizovnuralem/go2_ros2_sdk/assets/33475993/ddbe30ab-21d1-46fd-b44b-198efba92771)
-
-
-# Welcome to the Unitree Go2/G1 Digital Twins Project!
+# Unitree Go1 and Go2 Digital Twins in Isaac Sim
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-orbit-gold.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
-[![License](https://img.shields.io/badge/license-BSD--2-yellow.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
-We are thrilled to announce that the Unitree Go2/G1 robot has now been integrated with the Nvidia Isaac Sim (Orbit), marking a major step forward in robotics research and development. The combination of these two cutting-edge technologies opens up a world of possibilities for creating and testing algorithms in a variety of simulated environments.
-
-Get ready to take your research to the next level with this powerful new resource at your fingertips!
-
-
-## Real time Go2 Balancing:
-
-<p align="center">
-<img width="1280" height="600" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/60c2233a-7586-49b6-a134-a7bddc4dd9ae" alt='Go2'>
-</p>
-
-
-## Real time G1 Balancing:
-
-<p align="center">
-<img width="1280" height="600" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/d035f72a-8996-461c-a902-38e68052d029" alt='Go2'>
-</p>
-
-
-## Go2 Ros2 Camera stream:
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/c740147b-ce00-4d7c-94de-0140be135e3e" alt='Go2'>
-</p>
-
-
-## URDF real-time joints sync:
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/a8060b6e-e9b7-4d30-89f2-8a50b7510a2b" alt='Go2'>
-</p>
-
-## Foot force data stream:
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/95a34b03-471e-496a-88cc-38e7c4e1906d" alt='Go2'>
-</p>
-
-
-## Real-time RTX lidar stream:
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/3f078bf2-e4b6-45ca-8807-36537a4125b5" alt='Go2'>
-</p>
-
-
-## Custom envs (Office):
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/e2e9bdd0-1f40-41a8-86bc-c1097ab3fd7b" alt='Go2'>
-</p>
-
-
-## Custom envs (Warehouse):
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/5db6f331-60be-40bd-9b4b-ead44064ee44" alt='Go2'>
-</p>
-
-
-## VR support:
-
-<p align="center">
-<img width="1200" height="440" src="https://github.com/abizovnuralem/go2_omniverse/assets/33475993/d5b82fac-d945-4462-8b3d-4026456847f4" alt='Go2'>
-</p>
-
-
-## Project RoadMap:
-1. PPO balancing algorithm :white_check_mark: 
-2. Keyboard real time control :white_check_mark: 
-3. Camera stream to ROS2 :white_check_mark: 
-4. RTX Lidar stream to ROS2 :white_check_mark:
-5. IMU data stream to ROS2 :white_check_mark: 
-6. URDF real-time joints sync :white_check_mark:
-7. Foot force data stream :white_check_mark:
-8. Real-time control from ROS2 :white_check_mark:
-9. Nav2 with Slam_toolbox :white_check_mark:
-10. Bunch of RL-envs for custom dog training :white_check_mark:
-11. Custom numbers of robots :white_check_mark:
-12. Added G1 Unitree support :white_check_mark:
-
-## Your feedback and support mean the world to us. 
-OS1_REV6_32ch10hz2048res
-Together, let's push the boundaries of what's possible with the Unitree Go2/G1 and ROS2!
-
+Implementation of Unitree Go1 and Go2 in Isaac Sim including:
+  - RL Controller for both quadrupeds
+  - Lidar, IMU, Odometry and Camera Image Data publisher via ROS2
+  - different Lidar configuration available (Ouster OS1 and Unitree L1)
+  - Quadrupeds controllable via Keyboard and ROS2 commands
+  - different environments (office, park, warehouse)
 
 ## System requirements and installation
 You need to install:
 1. Ubuntu 22.04
 2. Nvidia Isaac Sim 2023.1.1
-3. Nvidia Orbit 0.3.0
-4. Ros2 Humble
+3. Ros2 Humble
+4. Nvidia Orbit 0.3.0
 
 
 Full instruction:
-```
+
 After installation of Nvidia Isaac Sim 2023.1.1 and Ros2 Humble:
 
 1. Clone this specific IsaacLab repo version: https://github.com/isaac-sim/IsaacLab/releases/tag/v0.3.1
 2. Execute in ubuntu terminal:
+```
 export ISAACSIM_PATH="${HOME}/.local/share/ov/pkg/isaac-sim-2023.1.1"
 export ISAACSIM_PYTHON_EXE="${ISAACSIM_PATH}/python.sh"
+```
 and also put it inside .bashrc file
-3. Inside the root folder of Orbit repo (https://github.com/isaac-sim/IsaacLab/releases/tag/v0.3.1) execute ln -s ${ISAACSIM_PATH} _isaac_sim
-4. Execute ./orbit.sh --conda
-5. Execute conda activate orbit
-6. Execute sudo apt install cmake build-essential
-7. Execute ./orbit.sh --install
-8. Execute ./orbit.sh --extra rsl_rl
+
+3. Inside the root folder of Orbit repo (https://github.com/isaac-sim/IsaacLab/releases/tag/v0.3.1) execute `ln -s ${ISAACSIM_PATH} _isaac_sim`
+4. Execute `./orbit.sh --conda`
+5. Execute `conda activate orbit`
+6. Execute `sudo apt install cmake build-essential`
+7. Execute `./orbit.sh --install`
+8. Execute `./orbit.sh --extra rsl_rl`
 9. Verify the installation using "python source/standalone/tutorials/00_sim/create_empty.py" You should be inside conda env.
-10. You need to check that you have "Isaac Sim Python 2023.1.1 - New Stage*" on the top of the window.
-11. Clone this repo with git clone https://github.com/abizovnuralem/go2_omniverse/ --recurse-submodules -j8 --depth=1
-12. Copy the config file Unitree_L1.json (located in go2_omniverse/Isaac_sim/Unitree/Unitree_L1.json) for the Unitree L1 LiDAR to the folder IsaacLab-0.3.1/source/data/sensors/lidar/Unitree_L1.json (if the path doesnt exists, create it)
+10.   You need to check that you have "Isaac Sim Python 2023.1.1 - New Stage*" on the top of the window.
+11.   Clone this repo with `git clone https://github.com/... --recurse-submodules -j8 --depth=1`
+12. Copy the config file Unitree_L1.json (located in "Lidar config files") for the Unitree L1 LiDAR to the folder IsaacLab-0.3.1/source/data/sensors/lidar/Unitree_L1.json (if the path doesnt exists, create it)
 13. Copy all material files in the isaac-sim-2023.1.1/data/material_files folder to IsaacLab_v0.3.1/source/data/material_files (if the path doesnt exists, create it)
 14. Execute ./run_sim.sh (without activated conda orbit env)
-```
+
 
 Some suggestions:
-1. You need to check nvidia-smi, it should work, before installing Isaac Sim
-2. You need to install Miniconda and execute: conda config --set auto_activate_base false
+1. You need to check `nvidia-smi`, it should work, before installing Isaac Sim
+2. You need to install Miniconda and execute: `conda config --set auto_activate_base false`
 3. Install Omniverse launcher and then install Isaac Sim.
-4. You need to install ROS2 on your system and configure it:
+4. You need to install ROS2 on your system and configure it: https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#isaac-sim-app-install-ros
 
-```
-https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#isaac-sim-app-install-ros
-```
 
 ## Usage
 The current project was tested on Ubuntu 22.04, IsaacSim 2023.1.1 with IsaacLab 0.3.1 and Nvidia Driver Version: 550.
-To start the project with Unitree Go2, execute:
+To start the project, execute:
 
-```
-./run_sim.sh
-```
+`./run_sim.sh`
 
-You can control the quadruped robot using "WASD" keyboard commands. Change the run_sim.sh file for Unitree Go1 or G1.
-
-## ROS2 SDK
-
-You can use https://github.com/abizovnuralem/go2_ros2_sdk as a basement for your ROS2 setup.
+You can control the quadruped robot using "WASD, Q and E" keyboard commands. Change the run_sim.sh file for Unitree Go1 or Go2 and different environments.
 
 
 ## Select custom env
 
-To use predifined custom envs, you need to download files from https://drive.google.com/drive/folders/1vVGuO1KIX1K6mD6mBHDZGm9nk2vaRyj3?usp=sharing and place them to /envs folder.
-Then you can execute it modifying run_sim.sh script with --custom_env=office and --terrain flat commands. If you are doing it first time, it will take 2-3 minutes to configure the env. Please, wait.
-
-
-## Development
-
-To contribute or modify the project, refer to these resources for implementing additional features or improving the existing codebase. PRs are welcome!
-
-## VR support
-
-To enable VR support on linux will take some time, but it works!
-I have tested it on:
-1. Ubuntu 22.04
-2. Nvidia drivers are 545.29.06 
-3. SteamVR 2.4.4 (IMPORTANT! It should be 2.4.4) and you need to go to Compatibility tab (Inside Steam app) and "Force the use of a specific Steam Play compatibility tool" and switch to "Steam-Play-None", additional info you can find in ALVR github issues tab.
-4. ALVR streamer 20.8.1 + Oculus Quest 2 (client ALVR you can install via SideQuest app) (How to install it: https://github.com/alvr-org/ALVR)
-5. Execute IsaacSim, Go to Window -> Extensions, find STEAMVR INPUT/OUTPUT then enable it and enable AutoLoad. Reopen IsaacSim. Use OpenXR mode.
-6. Enjoy Omniverse in VR mode!
-
-
-## Thanks
-Special thanks to 
-1. Leul Tesfaye for his expertise in Orbit lidars;
-2. Tamas @tfoldi for contributing to this project;
-3. @ShaoshuSu for his hardwork in investigating the speed issues with new version of Orbit (IsaacLab 4.0 and 4.1);
-
-
-## License
-
-This project is licensed under the BSD 2-clause License - see the [LICENSE](https://github.com/abizovnuralem/go2_omniverse/blob/master/LICENSE) file for details.
+To use predifined custom envs, you need to download files from *URL* and place them to /envs folder.
+Then you can execute it modifying run_sim.sh script with --custom_env=office commands. 

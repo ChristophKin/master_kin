@@ -4,10 +4,10 @@ source /opt/ros/${ROS_DISTRO}/setup.bash
 cd IsaacSim-ros_workspaces/${ROS_DISTRO}_ws
 
 # Install dependencies specified in package.xml files inside the src directory
-rosdep install --from-paths src --ignore-src -r -y
+##rosdep install --from-paths src --ignore-src -r -y
 
 # colcon build compiles all packages. Optionally, '--cmake-clean-cache' can be uncommented to clean the cache before building.
-colcon build #--cmake-clean-cache
+##colcon build #--cmake-clean-cache
 
 # Source the newly built workspace to overlay the environment with new packages.
 source install/setup.bash
@@ -26,8 +26,8 @@ export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
 # Run the main Python script with arguments:
 # --robot: go1 or go2
-# --custom_env: little_park, office or warehouse_full
-python main.py --robot go1 --custom_env little_park &
+# --custom_env: park, office or warehouse
+python main.py --robot go1 --custom_env park &
 
 # Execute a external shell script to run the point cloud modifier.
 # This is to make the published Lidar data format from Isaac suitable for Autoware.

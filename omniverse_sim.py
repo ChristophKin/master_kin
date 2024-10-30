@@ -84,17 +84,17 @@ def sub_keyboard_event(event) -> bool:
 
 def setup_custom_env():
     try:
-        if args_cli.custom_env == "little_park":
+        if args_cli.custom_env == "park":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/littlepark_cars.usd")
-            cfg_scene.func("/World/littlepark", cfg_scene, translation=(0.0, 0.0, 0.0))
+            cfg_scene.func("/World/park", cfg_scene, translation=(0.0, 0.0, 0.0))
 
         if args_cli.custom_env == "office":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/office_walls.usd")
             cfg_scene.func("/World/office", cfg_scene, translation=(0.0, 0.0, 0.0))
 
-        if args_cli.custom_env == "warehouse_full":
+        if args_cli.custom_env == "warehouse":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/warehouse_full.usd")
-            cfg_scene.func("/World/warehouse_full", cfg_scene, translation=(0.0, 0.0, 0.0))
+            cfg_scene.func("/World/warehouse", cfg_scene, translation=(0.0, 0.0, 0.0))
 
         if args_cli.custom_env == "brownstone":
             cfg_scene = sim_utils.UsdFileCfg(usd_path="./envs/brownstone.usd")
@@ -200,5 +200,5 @@ def run_sim():
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
-            pub_robo_data_ros2(base_node, env, annotator_lst, start_time)
+            pub_robo_data_ros2(base_node, env, annotator_lst)
     env.close()

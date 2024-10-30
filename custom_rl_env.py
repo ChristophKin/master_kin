@@ -64,7 +64,7 @@ def constant_commands(env: RLTaskEnvCfg) -> torch.Tensor:
 class MySceneCfg(InteractiveSceneCfg):
     """Configuration for the terrain scene with a legged robot."""
 
-    if args_cli.custom_env == "little_park":
+    if args_cli.custom_env == "park":
         #rough terrain
         terrain = TerrainImporterCfg(
             prim_path="/World/ground",
