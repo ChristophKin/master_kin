@@ -22,6 +22,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import asyncio
+import time
 
 import numpy as np
 
@@ -51,8 +52,8 @@ def add_rtx_lidar(robot_type, debug=False):
                                 pulse_time=1, 
                                 translation=(0.1, -0.1, -0.1),
                                 orientation=(1.0, 0.0, 0.0, 0.0),   #Isaac Sim Core API: (QW, QX, QY, QZ)
-                                config_file_name= "Unitree_L1",
-                                #config_file_name= "OS1_REV6_32ch20hz1024res",
+                                #config_file_name= "Unitree_L1",
+                                config_file_name= "OS1_REV6_32ch20hz1024res",
                                 )
 
     else:
@@ -92,11 +93,7 @@ def add_camera(robot_type):
     Camera(cameraCfg)
 
 
-def pub_robo_data_ros2(base_node, env, annotator_lst):
-    #base_node.publish_odom(env.env.scene["robot"].data.root_state_w[0, :3], 
-    #                       env.env.scene["robot"].data.root_state_w[0, 3:7], 
-    #                       env.env.scene["robot"].data.root_lin_vel_b[0, :], 
-    #                       env.env.scene["robot"].data.root_ang_vel_b[0, :])
+def pub_robo_data_ros2(base_node, env, annotator_lst, start_time):
     base_node.publish_joints(env.env.scene["robot"].data.joint_names, env.env.scene["robot"].data.joint_pos[0])
     base_node.publish_tf(env.env.scene["robot"].data.root_state_w[0, :3], 
                            env.env.scene["robot"].data.root_state_w[0, 3:7])
@@ -107,7 +104,9 @@ def pub_robo_data_ros2(base_node, env, annotator_lst):
                             env.env.scene["robot"].data.root_ang_vel_b[0, :])
                             
     try:
-        base_node.publish_lidar(annotator_lst[0].get_data()['data'])
+        if (time.time() - start_time) > 1/20:
+            base_node.publish_lidar(annotator_lst[0].get_data()['data'])
+            start_time = time.time()
     except:
         pass
 
@@ -123,12 +122,10 @@ class RobotBaseNode(Node):
         self.imu_pub = []
         self.twist_pub = []
 
-        self.joint_pub.append(self.create_publisher(JointState, f'sensing/joint_states', qos_profile))
+        self.joint_pub.append(self.create_publisher(JointState, f'/joint_states', qos_profile))
         self.go2_lidar_pub.append(self.create_publisher(PointCloud2, '/sensing/lidar/top/points', qos_profile))
-        #self.odom_pub.append(self.create_publisher(Odometry, 'sensing/odom/odom_data', qos_profile))
         self.imu_pub.append(self.create_publisher(Imu, '/sensing/imu/imu_data', qos_profile))
-        #self.twist_pub.append(self.create_publisher(TwistWithCovarianceStamped, '/localization/twist_estimator/twist_with_covariance', qos_profile)) #if gyro_estimator is not used
-        self.twist_pub.append(self.create_publisher(TwistWithCovarianceStamped, '/sensing/vehicle_velocity_converter/twist_with_covariance', qos_profile)) #if gyro_estimator is used
+        self.twist_pub.append(self.create_publisher(TwistWithCovarianceStamped, '/sensing/vehicle_velocity_converter/twist_with_covariance', qos_profile)) 
         self.broadcaster= TransformBroadcaster(self, qos=qos_profile)
 
 
@@ -198,7 +195,7 @@ class RobotBaseNode(Node):
         twist_topic.twist.twist.angular.z = ang_vel[2].item()
 
         cov = np.zeros((6, 6), dtype=np.float64)
-        np.fill_diagonal(cov, [0.1, 1.0, 1.0, 1.0, 1.0, 0.1])
+        np.fill_diagonal(cov, [0.05, 0.05, 0.5, 5.0, 5.0, 5.0]) # best: [0.05, 0.05, 0.5, 5, 5, 5]
         twist_topic.twist.covariance = cov.flatten()
         self.twist_pub[0].publish(twist_topic)
         
@@ -219,11 +216,11 @@ class RobotBaseNode(Node):
         imu_trans.orientation.w = base_rot[0].item()
 
         cov = np.zeros((3, 3), dtype=np.float64)
-        np.fill_diagonal(cov, [10.0, 10.0, 10.0])
+        np.fill_diagonal(cov, [25.0, 25.0, 50.0]) # best: [25, 25, 50]
         imu_trans.linear_acceleration_covariance = cov.flatten()
-
-        np.fill_diagonal(cov, [1.0, 1.0, 1.0])
+        np.fill_diagonal(cov, [5.0, 5.0, 5.0]) # best: [5, 5, 5]
         imu_trans.angular_velocity_covariance = cov.flatten()
+        np.fill_diagonal(cov, [0.05, 0.05, 10.0]) # best: [0.05, 0.05, 10]
         imu_trans.orientation_covariance = cov.flatten()
         self.imu_pub[0].publish(imu_trans)
 

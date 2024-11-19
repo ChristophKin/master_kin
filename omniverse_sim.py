@@ -200,5 +200,5 @@ def run_sim():
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
-            pub_robo_data_ros2(base_node, env, annotator_lst)
+            pub_robo_data_ros2(base_node, env, annotator_lst, start_time)
     env.close()

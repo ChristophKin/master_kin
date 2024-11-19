@@ -4,10 +4,10 @@ source /opt/ros/${ROS_DISTRO}/setup.bash
 cd IsaacSim-ros_workspaces/${ROS_DISTRO}_ws
 
 # Install dependencies specified in package.xml files inside the src directory
-##rosdep install --from-paths src --ignore-src -r -y
+rosdep install --from-paths src --ignore-src -r -y
 
 # colcon build compiles all packages. Optionally, '--cmake-clean-cache' can be uncommented to clean the cache before building.
-##colcon build #--cmake-clean-cache
+colcon build #--cmake-clean-cache
 
 # Source the newly built workspace to overlay the environment with new packages.
 source install/setup.bash
