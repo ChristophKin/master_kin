@@ -1,4 +1,4 @@
-# Unitree Go1 and Go2 Digital Twins in Isaac Sim
+# Unitree Go1 and Go2 in Isaac Sim
 
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-orbit-gold.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
