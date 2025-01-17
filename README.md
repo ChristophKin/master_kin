@@ -61,5 +61,5 @@ You can control the quadruped robot using "WASD, Q and E" keyboard commands. Cha
 
 ## Select custom env
 
-To use predifined custom envs, you need to download files from *URL* and place them to /envs folder.
+To use predifined custom envs, you need to download files from https://v2c2-my.sharepoint.com/:f:/g/personal/christoph_kinberger_v2c2_at/EiZflwBFMO1LqiIh68orRpQBnfl58P8o0kjpdZ49ggqo9Q?e=Pq2t7Q and place them to /envs folder.
 Then you can execute it modifying run_sim.sh script with --custom_env=office commands. 
