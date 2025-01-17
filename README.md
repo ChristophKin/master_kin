@@ -2,10 +2,6 @@
 
 # Unitree Go1 and Go2 in Isaac Sim
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-orbit-gold.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
-[![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
-
 Implementation of Unitree Go1 and Go2 in Isaac Sim including:
   - RL Controller for both quadrupeds
   - Lidar, IMU, Odometry and Camera Image Data publisher via ROS2
