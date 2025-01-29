@@ -162,27 +162,6 @@ class RobotBaseNode(Node):
         self.broadcaster.sendTransform(odom_trans)
 
 
-    def publish_odom(self, base_pos, base_rot, lin_vel, ang_vel):
-        odom_topic = Odometry()
-        odom_topic.header.stamp = self.get_clock().now().to_msg()
-        odom_topic.header.frame_id = "map"
-        odom_topic.child_frame_id = "base_link"
-        odom_topic.pose.pose.position.x = base_pos[0].item()
-        odom_topic.pose.pose.position.y = base_pos[1].item()
-        odom_topic.pose.pose.position.z = base_pos[2].item()
-        odom_topic.pose.pose.orientation.x = base_rot[1].item()
-        odom_topic.pose.pose.orientation.y = base_rot[2].item()
-        odom_topic.pose.pose.orientation.z = base_rot[3].item()
-        odom_topic.pose.pose.orientation.w = base_rot[0].item()
-        odom_topic.twist.twist.linear.x = lin_vel[0].item()
-        odom_topic.twist.twist.linear.y = lin_vel[1].item()
-        odom_topic.twist.twist.linear.z = lin_vel[2].item()
-        odom_topic.twist.twist.angular.x = ang_vel[0].item()
-        odom_topic.twist.twist.angular.y = ang_vel[1].item()
-        odom_topic.twist.twist.angular.z = ang_vel[2].item()
-        self.odom_pub[0].publish(odom_topic)
-
-
     def publish_twist(self, lin_vel, ang_vel):
         twist_topic = TwistWithCovarianceStamped()
         twist_topic.header.stamp = self.get_clock().now().to_msg()
@@ -195,7 +174,7 @@ class RobotBaseNode(Node):
         twist_topic.twist.twist.angular.z = ang_vel[2].item()
 
         cov = np.zeros((6, 6), dtype=np.float64)
-        np.fill_diagonal(cov, [0.05, 0.05, 0.5, 5.0, 5.0, 5.0]) # best: [0.05, 0.05, 0.5, 5, 5, 5]
+        np.fill_diagonal(cov, [0.651, 0.2979, 1.087, 21, 19.88, 0.615]) # best: [0.05, 0.05, 0.5, 5, 5, 5]
         twist_topic.twist.covariance = cov.flatten()
         self.twist_pub[0].publish(twist_topic)
         
@@ -204,9 +183,9 @@ class RobotBaseNode(Node):
         imu_trans = Imu()
         imu_trans.header.stamp = self.get_clock().now().to_msg()
         imu_trans.header.frame_id = "base_link"
-        imu_trans.linear_acceleration.x = base_lin_acc[0].item()
-        imu_trans.linear_acceleration.y = base_lin_acc[1].item()
-        imu_trans.linear_acceleration.z = base_lin_acc[2].item()
+        imu_trans.linear_acceleration.x = base_lin_acc[0].item()/10
+        imu_trans.linear_acceleration.y = base_lin_acc[1].item()/10
+        imu_trans.linear_acceleration.z = base_lin_acc[2].item()/10
         imu_trans.angular_velocity.x = base_ang_vel[0].item()
         imu_trans.angular_velocity.y = base_ang_vel[1].item()
         imu_trans.angular_velocity.z = base_ang_vel[2].item()
@@ -216,11 +195,11 @@ class RobotBaseNode(Node):
         imu_trans.orientation.w = base_rot[0].item()
 
         cov = np.zeros((3, 3), dtype=np.float64)
-        np.fill_diagonal(cov, [25.0, 25.0, 50.0]) # best: [25, 25, 50]
+        np.fill_diagonal(cov, [108,	20,	420]) # best: [25, 25, 50]
         imu_trans.linear_acceleration_covariance = cov.flatten()
-        np.fill_diagonal(cov, [5.0, 5.0, 5.0]) # best: [5, 5, 5]
+        np.fill_diagonal(cov, [2.1,	1.99, 0.0615]) # best: [5, 5, 5]
         imu_trans.angular_velocity_covariance = cov.flatten()
-        np.fill_diagonal(cov, [0.05, 0.05, 10.0]) # best: [0.05, 0.05, 10]
+        np.fill_diagonal(cov, [0.0491, 0.02239, 0.009925]) # best: [0.05, 0.05, 10]
         imu_trans.orientation_covariance = cov.flatten()
         self.imu_pub[0].publish(imu_trans)
 
