@@ -1,8 +1,6 @@
-# Unitree Go1 and Go2 Digital Twins in Isaac Sim
+![LittleParkCars_2](https://github.com/user-attachments/assets/d1cb1927-d50c-40a2-8806-4cecb5374e2d)
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-orbit-gold.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
-[![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/22.04/)
+# Unitree Go1 and Go2 in Isaac Sim
 
 Implementation of Unitree Go1 and Go2 in Isaac Sim including:
   - RL Controller for both quadrupeds
@@ -63,5 +61,5 @@ You can control the quadruped robot using "WASD, Q and E" keyboard commands. Cha
 
 ## Select custom env
 
-To use predifined custom envs, you need to download files from *URL* and place them to /envs folder.
+To use predifined custom envs, you need to download files from https://v2c2-my.sharepoint.com/:f:/g/personal/christoph_kinberger_v2c2_at/EiZflwBFMO1LqiIh68orRpQBnfl58P8o0kjpdZ49ggqo9Q?e=Pq2t7Q and place them to /envs folder.
 Then you can execute it modifying run_sim.sh script with --custom_env=office commands. 
