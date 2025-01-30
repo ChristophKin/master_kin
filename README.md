@@ -58,6 +58,8 @@ To start the project, execute:
 
 You can control the quadruped robot using "WASD, Q and E" keyboard commands. Change the run_sim.sh file for Unitree Go1 or Go2 and different environments.
 
+With the repo https://github.com/ChristophKin/ros2_pointcloud_processor/tree/main can the published PointCloud be modified, to fit the PointXYZIRC type which Autoware needs.
+
 
 ## Select custom env
 
